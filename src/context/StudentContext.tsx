@@ -13,6 +13,11 @@ export interface Submission {
   content: string; // The descriptive answer or a summary
   timestamp: string;
   violationsCount: number;
+  violations?: {
+    type: string;
+    details: string;
+    timestamp: string;
+  }[];
 }
 
 export interface Student {

@@ -50,7 +50,12 @@ export const StudentExam: React.FC = () => {
       level: vCount > 3 ? 'High' : vCount > 1 ? 'Medium' : 'Low',
       content: Object.values(answers).join(' | '),
       timestamp: new Date().toISOString(),
-      violationsCount: vCount
+      violationsCount: vCount,
+      violations: violations.map(v => ({
+        type: v.type,
+        details: v.details,
+        timestamp: v.timestamp
+      }))
     };
     
     addSubmission(submission);

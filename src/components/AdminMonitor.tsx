@@ -203,6 +203,20 @@ export const AdminMonitor: React.FC = () => {
                           </div>
                         </div>
                       )}
+
+                      {selectedStudent.violations && selectedStudent.violations.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Security Violation Log</h4>
+                          <div className="space-y-2">
+                             {selectedStudent.violations.map((v, i) => (
+                               <div key={i} className="flex items-start space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-100 italic text-[10px] text-slate-600">
+                                 <AlertCircle size={12} className="text-red-500 shrink-0 mt-0.5" />
+                                 <span>{v.details}</span>
+                               </div>
+                             ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-5 border-t border-slate-100 bg-slate-50/30">
@@ -573,6 +587,61 @@ export const AdminMonitor: React.FC = () => {
                 </div>
               )}
             </AnimatePresence>
+          </div>
+        );
+      case 'logs':
+        const allViolations = submissions.flatMap(s => (s.violations || []).map(v => ({ ...v, studentName: s.studentName, enrollmentId: s.enrollmentId, examTitle: s.examTitle })));
+        return (
+          <div className="flex-1 p-8 overflow-y-auto">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold text-slate-800">Intrusion & Violation Logs</h3>
+              <p className="text-sm text-slate-500">Security audit trail for all examination sessions</p>
+            </div>
+            
+            <div className="pro-card overflow-hidden">
+               <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-6 py-4">Timestamp</th>
+                      <th className="px-6 py-4">Student</th>
+                      <th className="px-6 py-4">Program</th>
+                      <th className="px-6 py-4">Violation Type</th>
+                      <th className="px-6 py-4">Context Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm">
+                    {allViolations.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).map((v, idx) => (
+                      <tr key={idx} className="border-b border-slate-50 hover:bg-red-50/30 transition-colors">
+                        <td className="px-6 py-4 font-mono text-[10px] text-slate-400">
+                          {new Date(v.timestamp).toLocaleTimeString()}
+                        </td>
+                        <td className="px-6 py-4">
+                           <p className="font-bold text-slate-800">{v.studentName}</p>
+                           <p className="text-[10px] text-slate-500 uppercase tracking-tight">{v.enrollmentId}</p>
+                        </td>
+                        <td className="px-6 py-4 text-xs font-medium text-slate-600">{v.examTitle}</td>
+                        <td className="px-6 py-4">
+                           <span className={cn(
+                             "px-2 py-0.5 rounded text-[9px] font-black uppercase",
+                             v.type === 'tab_switch' ? "bg-red-100 text-red-700" :
+                             v.type === 'blur' ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-700"
+                           )}>
+                             {v.type.replace('_', ' ')}
+                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-slate-500 text-xs italic">"{v.details}"</td>
+                      </tr>
+                    ))}
+                    {allViolations.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400 font-medium italic">
+                          No security violations recorded in current audit cycle.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+               </table>
+            </div>
           </div>
         );
       default:
