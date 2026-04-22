@@ -39,6 +39,13 @@ A robust, full-stack examination portal with integrated AI proctoring, real-time
    npm install
    ```
 
+3. Setup environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your [Gemini API Key](https://aistudio.google.com/app/apikey)
+   ```bash
+   cp .env.example .env
+   ```
+
 ### Running the Application
 
 - **Development Mode**: Starts the Express server with Vite middleware and hot reloading.
