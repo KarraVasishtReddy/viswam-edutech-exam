@@ -190,6 +190,21 @@ export const AdminMonitor: React.FC = () => {
                         </div>
                       </div>
 
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl shadow-sm">
+                          <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Exam Score</h4>
+                          <p className="text-xl font-black text-blue-700 font-mono">
+                            {selectedStudent.score || 0} <span className="text-sm font-bold opacity-60">/ {selectedStudent.totalQuestions || 0}</span>
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl shadow-sm">
+                          <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Final Result</h4>
+                          <p className="text-xl font-black text-slate-700 font-mono uppercase tracking-tighter">
+                            {selectedStudent.totalQuestions ? ((selectedStudent.score || 0) / selectedStudent.totalQuestions * 100).toFixed(0) : 0}%
+                          </p>
+                        </div>
+                      </div>
+
                       <div>
                         <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Descriptive Answer (Q3)</h4>
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs leading-relaxed text-slate-700 font-medium">
@@ -428,33 +443,60 @@ export const AdminMonitor: React.FC = () => {
                         {q.options.map((opt, oIdx) => (
                           <div key={oIdx}>
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Option {oIdx + 1}</label>
-                            <div className="flex items-center space-x-2">
+                            <div className={cn(
+                              "flex items-center space-x-2 p-1 px-2 rounded-2xl transition-all border",
+                              q.correctAnswer === opt && opt !== '' ? "bg-green-50 border-green-200" : "border-transparent"
+                            )}>
                               <input 
                                 type="text"
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:border-blue-400 outline-none"
+                                className={cn(
+                                  "flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm focus:border-blue-400 outline-none",
+                                  q.correctAnswer === opt && opt !== '' && "border-green-300 text-green-900 font-bold"
+                                )}
                                 value={opt}
                                 onChange={(e) => {
                                   const newQs = [...selectedExamForEdit.questions];
+                                  const oldVal = q.options![oIdx];
+                                  const newVal = e.target.value;
                                   const opts = [...(newQs[qIdx].options || [])];
-                                  opts[oIdx] = e.target.value;
+                                  opts[oIdx] = newVal;
                                   newQs[qIdx].options = opts;
+                                  
+                                  // Sync correct answer if this was the correct one
+                                  if (newQs[qIdx].correctAnswer === oldVal && oldVal !== '') {
+                                    newQs[qIdx].correctAnswer = newVal;
+                                  }
+                                  
                                   onUpdateQuestions(newQs);
                                 }}
                               />
-                               <input 
-                                type="radio" 
-                                name={`correct-${q.id}`}
-                                checked={q.correctAnswer === opt && opt !== ''}
-                                onChange={() => {
-                                  const newQs = [...selectedExamForEdit.questions];
-                                  newQs[qIdx].correctAnswer = opt;
-                                  onUpdateQuestions(newQs);
-                                }}
-                                className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                              />
+                               <div className="relative flex items-center justify-center">
+                                 <input 
+                                  type="radio" 
+                                  name={`correct-${q.id}`}
+                                  checked={q.correctAnswer === opt && opt !== ''}
+                                  onChange={() => {
+                                    const newQs = [...selectedExamForEdit.questions];
+                                    newQs[qIdx].correctAnswer = opt;
+                                    onUpdateQuestions(newQs);
+                                  }}
+                                  className="w-5 h-5 cursor-pointer appearance-none border-2 border-slate-200 rounded-full checked:bg-green-500 checked:border-green-500 transition-all"
+                                  title="Mark as correct answer"
+                                />
+                                {q.correctAnswer === opt && opt !== '' && (
+                                  <Check size={12} className="absolute text-white pointer-events-none" />
+                                )}
+                               </div>
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {q.type === 'mcq' && !q.correctAnswer && (
+                      <div className="flex items-center space-x-2 text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-100 mt-4">
+                        <AlertCircle size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-tight">No correct answer assigned. Scoring will fail.</span>
                       </div>
                     )}
                   </div>
