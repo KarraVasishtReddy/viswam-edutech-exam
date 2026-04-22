@@ -91,6 +91,7 @@ export const AdminMonitor: React.FC = () => {
                         <th className="px-6 py-4">Student Name</th>
                         <th className="px-6 py-4">Exam</th>
                         <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4">Score</th>
                         <th className="px-6 py-4">AI Risk</th>
                         <th className="px-6 py-4">Action</th>
                       </tr>
@@ -109,6 +110,9 @@ export const AdminMonitor: React.FC = () => {
                             )}>
                               {s.state}
                             </span>
+                          </td>
+                          <td className="px-6 py-4 font-mono text-xs font-bold text-slate-700">
+                            {s.score ?? 0} / {s.totalQuestions ?? 0}
                           </td>
                           <td className={cn("px-6 py-4", s.level === 'High' ? 'text-red-500' : 'text-slate-400')}>
                             <span className="font-mono text-xs">{s.risk}</span>
@@ -502,6 +506,7 @@ export const AdminMonitor: React.FC = () => {
                       <th className="px-6 py-4">Name</th>
                       <th className="px-6 py-4">Email</th>
                       <th className="px-6 py-4">Exams Taken</th>
+                      <th className="px-6 py-4">Avg. Score</th>
                       <th className="px-6 py-4">Avg. Integrity</th>
                       <th className="px-6 py-4">Action</th>
                     </tr>
@@ -513,6 +518,7 @@ export const AdminMonitor: React.FC = () => {
                         <td className="px-6 py-4 font-bold text-slate-800">{student.name}</td>
                         <td className="px-6 py-4 text-slate-500">{student.email}</td>
                         <td className="px-6 py-4 font-medium">{student.examsTaken}</td>
+                        <td className="px-6 py-4 font-bold text-blue-600">{student.avgScore || '0%'}</td>
                         <td className="px-6 py-4">
                            <span className={cn(
                              "px-2 py-0.5 rounded text-[10px] font-black",

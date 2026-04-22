@@ -38,6 +38,14 @@ export const StudentExam: React.FC = () => {
   const finalizeExam = (vCount: number) => {
     if (!selectedExam) return;
     
+    // Calculate Score
+    let calculatedScore = 0;
+    selectedExam.questions.forEach(q => {
+      if (q.type === 'mcq' && answers[q.id] === q.correctAnswer) {
+        calculatedScore += 1;
+      }
+    });
+
     const submission: Submission = {
       id: Math.random().toString(36).substr(2, 9),
       studentName: user || 'Anonymous',
@@ -51,6 +59,8 @@ export const StudentExam: React.FC = () => {
       content: Object.values(answers).join(' | '),
       timestamp: new Date().toISOString(),
       violationsCount: vCount,
+      score: calculatedScore,
+      totalQuestions: selectedExam.questions.length,
       violations: violations.map(v => ({
         type: v.type,
         details: v.details,

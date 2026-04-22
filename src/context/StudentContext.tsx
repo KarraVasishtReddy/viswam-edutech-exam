@@ -13,6 +13,8 @@ export interface Submission {
   content: string; // The descriptive answer or a summary
   timestamp: string;
   violationsCount: number;
+  score?: number;
+  totalQuestions?: number;
   violations?: {
     type: string;
     details: string;
@@ -26,6 +28,7 @@ export interface Student {
   email: string;
   examsTaken: number;
   avgIntegrity: string;
+  avgScore?: string;
 }
 
 interface StudentContextType {
@@ -71,9 +74,14 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Update student stats
     setStudents(prev => prev.map(s => {
       if (s.id === submission.enrollmentId) {
+        const studentSubmissions = [...submissions, submission].filter(sub => sub.enrollmentId === s.id);
+        const totalPossible = studentSubmissions.reduce((sum, sub) => sum + (sub.totalQuestions || 0), 0);
+        const totalScored = studentSubmissions.reduce((sum, sub) => sum + (sub.score || 0), 0);
+        
+        const avgScore = totalPossible > 0 ? ((totalScored / totalPossible) * 100).toFixed(1) + '%' : '0%';
         const newExamsTaken = s.examsTaken + 1;
-        // Simple logic for avg integrity update
-        return { ...s, examsTaken: newExamsTaken };
+
+        return { ...s, examsTaken: newExamsTaken, avgScore };
       }
       return s;
     }));
