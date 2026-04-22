@@ -1,0 +1,71 @@
+{
+  "entities": {
+    "Exam": {
+      "title": "Exam",
+      "description": "Definition of an exam assessment",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "duration": { "type": "integer", "description": "Duration in minutes" },
+        "questions": { 
+          "type": "array",
+          "items": { "$ref": "#/entities/Question" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "duration", "questions"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "A single exam question",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "enum": ["mcq", "descriptive"] },
+        "text": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "string" }
+      }
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "A student's attempt at an exam",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentEmail": { "type": "string" },
+        "examId": { "type": "string" },
+        "answers": { "type": "object" },
+        "score": { "type": "number" },
+        "status": { "enum": ["active", "submitted", "terminated"] },
+        "progress": { "type": "number", "description": "0-100 percentage" },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "violationLogs": { 
+          "type": "array",
+          "items": { "$ref": "#/entities/Violation" }
+        }
+      }
+    },
+    "Violation": {
+      "title": "Violation",
+      "description": "Security incident record",
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["tab_switch", "blur", "resize"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "details": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/exams/{examId}": {
+      "schema": "Exam",
+      "description": "Storage for exam metadata and questions"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "Submission",
+      "description": "Student exam attempts and results"
+    }
+  }
+}
